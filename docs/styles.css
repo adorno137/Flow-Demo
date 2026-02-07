@@ -63,8 +63,12 @@ body {
   flex: 1;
 }
 
+.control--readout {
+  justify-content: space-between;
+}
+
 .control__value {
-  min-width: 48px;
+  min-width: 120px;
   text-align: right;
   color: var(--secondary);
 }
