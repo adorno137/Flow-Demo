@@ -16,3 +16,11 @@ Kleine, statische Web-Demo zur Stromflussanzeige mit animierten Verbindungen zwi
 - `docs/index.html`: Layout und SVG-Verbindungen
 - `docs/styles.css`: Gestaltung
 - `docs/app.js`: Animation und Steuerung
+
+## Nutzung
+
+- Stelle die PV-Leistung und den Hausverbrauch über die Regler ein.
+- Die Anzeige "Netz" zeigt Load - PV:
+  - positiv = Netzbezug
+  - negativ = Einspeisung
+- Aktive Linien und Punktgeschwindigkeiten spiegeln die jeweilige Leistung wider.

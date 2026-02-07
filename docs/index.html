@@ -14,18 +14,22 @@
       </header>
 
       <section class="controls" aria-label="Steuerung">
-        <label class="control control--toggle">
-          <span>Überschuss</span>
-          <input id="modeToggle" type="checkbox" checked />
-          <span class="control__switch" aria-hidden="true"></span>
-          <span>Bezug</span>
+        <label class="control control--range">
+          <span>PV-Leistung</span>
+          <input id="pvInput" type="range" min="0" max="10000" step="100" value="2000" />
+          <span id="pvValue" class="control__value">PV: 2000 W</span>
         </label>
 
         <label class="control control--range">
-          <span>Geschwindigkeit</span>
-          <input id="speedSlider" type="range" min="0.4" max="3" step="0.1" value="1.2" />
-          <span id="speedValue" class="control__value">1.2×</span>
+          <span>Hausverbrauch</span>
+          <input id="loadInput" type="range" min="0" max="10000" step="100" value="1500" />
+          <span id="loadValue" class="control__value">Load: 1500 W</span>
         </label>
+
+        <div class="control control--readout" aria-live="polite">
+          <span>Netz</span>
+          <span id="gridValue" class="control__value">Netz: -500 W</span>
+        </div>
 
         <label class="control control--toggle">
           <span>Animation an</span>
@@ -56,17 +60,20 @@
             </linearGradient>
           </defs>
           <path id="path-sun-house" d="M150 130 C 260 80, 340 80, 450 130" />
-          <path id="path-house-grid" d="M450 130 C 560 180, 640 180, 750 130" />
-          <circle class="dot dot--sun" r="6" />
-          <circle class="dot dot--sun" r="4" />
-          <circle class="dot dot--grid" r="6" />
-          <circle class="dot dot--grid" r="4" />
+          <path id="path-sun-grid" d="M150 130 C 320 20, 580 20, 750 130" />
+          <path id="path-grid-house" d="M750 130 C 640 180, 560 180, 450 130" />
+          <circle class="dot dot--sun-house" r="6" />
+          <circle class="dot dot--sun-house" r="4" />
+          <circle class="dot dot--sun-grid" r="6" />
+          <circle class="dot dot--sun-grid" r="4" />
+          <circle class="dot dot--grid-house" r="6" />
+          <circle class="dot dot--grid-house" r="4" />
         </svg>
       </section>
 
       <footer class="legend">
         <span class="legend__item">Linien zeigen aktive Verbindungen</span>
-        <span class="legend__item" id="modeLabel">Modus: Überschuss</span>
+        <span class="legend__item">Negative Netzleistung = Einspeisung</span>
       </footer>
     </main>
 
