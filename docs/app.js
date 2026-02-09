@@ -94,7 +94,7 @@ const applyConnectionState = (path, dots, powerW) => {
   const active = powerW > 0;
   const norm = normalizePower(powerW);
   const strokeWidth = 2 + norm * 6;
-  const speedFactor = 0.6 + norm * 2.0;
+  const speedFactor = active ? 0.6 + norm * 2.0 : 0;
 
   path.style.opacity = active ? "1" : "0";
   path.style.strokeWidth = active ? strokeWidth.toFixed(2) : "0";
@@ -129,14 +129,14 @@ const animate = (timestamp) => {
   const loadW = Number(loadInput.value);
   const gridW = loadW - pvW;
   const pvToHouseW = Math.min(pvW, loadW);
-  const pvToGridW = Math.max(0, pvW - loadW);
-  const gridToHouseW = Math.max(0, gridW);
+  const gridFlowW = Math.abs(gridW);
+  const gridToHouse = gridW > 0;
 
   updateReadouts(pvW, loadW, gridW);
 
   const sunHouseSpeed = applyConnectionState(pathSunHouse, dotsSunHouse, pvToHouseW);
-  const sunGridSpeed = applyConnectionState(pathSunGrid, dotsSunGrid, pvToGridW);
-  const gridHouseSpeed = applyConnectionState(pathGridHouse, dotsGridHouse, gridToHouseW);
+  const sunGridSpeed = applyConnectionState(pathSunGrid, dotsSunGrid, 0);
+  const gridHouseSpeed = applyConnectionState(pathGridHouse, dotsGridHouse, gridFlowW);
 
   if (animationActive) {
     progressSunHouse = (progressSunHouse + delta * baseSpeed * sunHouseSpeed) % 1;
@@ -146,7 +146,7 @@ const animate = (timestamp) => {
 
   placeDots(pathSunHouse, sunHouseLength, dotsSunHouse, progressSunHouse, false);
   placeDots(pathSunGrid, sunGridLength, dotsSunGrid, progressSunGrid, false);
-  placeDots(pathGridHouse, gridHouseLength, dotsGridHouse, progressGridHouse, false);
+  placeDots(pathGridHouse, gridHouseLength, dotsGridHouse, progressGridHouse, !gridToHouse);
 
   requestAnimationFrame(animate);
 };
