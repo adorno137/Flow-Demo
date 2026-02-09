@@ -5,6 +5,12 @@ const loadValue = document.getElementById("loadValue");
 const gridValue = document.getElementById("gridValue");
 const animationToggle = document.getElementById("animationToggle");
 
+const layout = document.querySelector(".layout");
+const tileSun = document.getElementById("tile-sun");
+const tileHouse = document.getElementById("tile-house");
+const tileGrid = document.getElementById("tile-grid");
+const connections = document.querySelector(".connections");
+
 const pathSunHouse = document.getElementById("path-sun-house");
 const pathSunGrid = document.getElementById("path-sun-grid");
 const pathGridHouse = document.getElementById("path-grid-house");
@@ -18,9 +24,9 @@ let progressSunGrid = 0;
 let progressGridHouse = 0;
 let animationActive = true;
 
-const sunHouseLength = pathSunHouse.getTotalLength();
-const sunGridLength = pathSunGrid.getTotalLength();
-const gridHouseLength = pathGridHouse.getTotalLength();
+let sunHouseLength = 0;
+let sunGridLength = 0;
+let gridHouseLength = 0;
 
 const dotOffsets = [0, 0.45];
 // Normalisierung für Linien-Dicke und Punktgeschwindigkeit.
@@ -33,6 +39,50 @@ const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 const normalizePower = (value) => clamp(value / maxPowerW, 0, 1);
 
 const formatWatts = (value) => `${Math.round(value)} W`;
+
+const getCenterPoint = (element, containerRect) => {
+  const rect = element.getBoundingClientRect();
+  return {
+    x: rect.left - containerRect.left + rect.width / 2,
+    y: rect.top - containerRect.top + rect.height / 2,
+  };
+};
+
+const buildCurvedPath = (start, end, curvature = 0.2, direction = 1) => {
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const distance = Math.hypot(dx, dy) || 1;
+  const offset = Math.min(60, distance * curvature);
+  const perpX = (-dy / distance) * offset * direction;
+  const perpY = (dx / distance) * offset * direction;
+  const controlX = (start.x + end.x) / 2 + perpX;
+  const controlY = (start.y + end.y) / 2 + perpY;
+
+  return `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} Q ${controlX.toFixed(2)} ${controlY.toFixed(2)} ${end.x.toFixed(2)} ${end.y.toFixed(2)}`;
+};
+
+const updateConnectionPaths = () => {
+  if (!layout || !connections || !tileSun || !tileHouse || !tileGrid) {
+    return;
+  }
+  const containerRect = layout.getBoundingClientRect();
+  const width = Math.max(0, containerRect.width);
+  const height = Math.max(0, containerRect.height);
+
+  connections.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+  const sunCenter = getCenterPoint(tileSun, containerRect);
+  const houseCenter = getCenterPoint(tileHouse, containerRect);
+  const gridCenter = getCenterPoint(tileGrid, containerRect);
+
+  pathSunHouse.setAttribute("d", buildCurvedPath(sunCenter, houseCenter, 0.18, -1));
+  pathSunGrid.setAttribute("d", buildCurvedPath(sunCenter, gridCenter, 0.18, 1));
+  pathGridHouse.setAttribute("d", buildCurvedPath(gridCenter, houseCenter, 0.18, 1));
+
+  sunHouseLength = pathSunHouse.getTotalLength();
+  sunGridLength = pathSunGrid.getTotalLength();
+  gridHouseLength = pathGridHouse.getTotalLength();
+};
 
 const updateReadouts = (pvW, loadW, gridW) => {
   pvValue.textContent = `PV: ${formatWatts(pvW)}`;
@@ -114,4 +164,8 @@ animationToggle.addEventListener("change", (event) => {
 });
 
 updateReadouts(Number(pvInput.value), Number(loadInput.value), Number(loadInput.value) - Number(pvInput.value));
+window.addEventListener("resize", updateConnectionPaths);
+window.addEventListener("orientationchange", updateConnectionPaths);
+window.addEventListener("load", updateConnectionPaths);
+updateConnectionPaths();
 requestAnimationFrame(animate);
